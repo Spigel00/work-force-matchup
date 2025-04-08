@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider } from "./contexts/AppContext";
 
 // Pages
@@ -11,11 +11,14 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Jobs from "./pages/Jobs";
+import Workers from "./pages/Workers";
 import JobDetail from "./pages/JobDetail";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import PostJob from "./pages/PostJob";
 import WorkerProfile from "./pages/WorkerProfile";
+import Settings from "./pages/Settings";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,11 +35,16 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/jobs" element={<Jobs />} />
+            <Route path="/workers" element={<Workers />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/worker-dashboard" element={<WorkerDashboard />} />
             <Route path="/employer-dashboard" element={<EmployerDashboard />} />
             <Route path="/post-job" element={<PostJob />} />
             <Route path="/workers/:id" element={<WorkerProfile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/about" element={<About />} />
+            {/* Redirect Index to Home */}
+            <Route path="/index" element={<Navigate to="/" replace />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

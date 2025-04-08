@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { 
   UserRole, 
@@ -9,6 +8,7 @@ import {
 } from "../types/models";
 import { mockUsers, mockWorkers, mockEmployers, mockJobs } from "../data/mockData";
 import { useToast } from "@/hooks/use-toast";
+import { saveDataToStorage, loadDataFromStorage } from "@/services/storageService";
 
 interface AppContextProps {
   currentUser: User | null;
@@ -25,6 +25,7 @@ interface AppContextProps {
   getWorkerProfile: (id: string) => WorkerProfile | undefined;
   getEmployerProfile: (id: string) => EmployerProfile | undefined;
   getJobById: (id: string) => JobPosting | undefined;
+  exportData: () => void;
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
@@ -45,20 +46,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load mock data
-    setWorkers(mockWorkers);
-    setEmployers(mockEmployers);
-    setJobs(mockJobs);
+    const storedData = loadDataFromStorage();
+    
+    if (storedData) {
+      setWorkers(storedData.workers);
+      setEmployers(storedData.employers);
+      setJobs(storedData.jobs);
+    } else {
+      setWorkers(mockWorkers);
+      setEmployers(mockEmployers);
+      setJobs(mockJobs);
+    }
 
-    // Check for saved user session
     const savedUser = localStorage.getItem("currentUser");
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
   }, []);
 
+  useEffect(() => {
+    if (workers.length > 0 && employers.length > 0 && jobs.length > 0) {
+      saveDataToStorage({
+        users: mockUsers,
+        workers,
+        employers,
+        jobs
+      });
+    }
+  }, [workers, employers, jobs]);
+
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call/authentication
     const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (user) {
@@ -94,7 +111,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     name: string, 
     role: UserRole
   ): Promise<boolean> => {
-    // Check if user already exists
     const userExists = mockUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (userExists) {
@@ -106,7 +122,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return false;
     }
     
-    // Create a new user (in a real app, this would be an API call)
     const newUser: User = {
       id: `user${mockUsers.length + 1}`,
       email,
@@ -115,8 +130,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       joined: new Date().toISOString().split('T')[0],
     };
     
-    // In a real app, we would save this user to a database
-    // For now, we'll just update our local state
     setCurrentUser(newUser);
     localStorage.setItem("currentUser", JSON.stringify(newUser));
     
@@ -173,31 +186,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return [];
     }
 
-    // Simple recommendation algorithm: match by skills, job titles, and salary
     return jobs
       .filter(job => {
-        // Match based on skill overlap
         const matchingSkills = job.requiredSkills.filter(
           skill => worker.skills.includes(skill)
         );
         
-        // Match based on job title preferences
         const titleMatch = worker.preferredJobTitles.some(
           title => job.title.toLowerCase().includes(title.toLowerCase())
         );
         
-        // Match based on salary range (if specified)
         const salaryMatch = !worker.desiredSalary || !job.salary 
           ? true 
           : job.salary.min === undefined 
             ? true 
             : worker.desiredSalary <= (job.salary.max || job.salary.min);
         
-        // Job needs to have at least one matching skill or title
         return (matchingSkills.length > 0 || titleMatch) && salaryMatch;
       })
       .sort((a, b) => {
-        // Sort by number of matching skills
         const aMatchCount = a.requiredSkills.filter(skill => worker.skills.includes(skill)).length;
         const bMatchCount = b.requiredSkills.filter(skill => worker.skills.includes(skill)).length;
         return bMatchCount - aMatchCount;
@@ -211,28 +218,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return [];
     }
 
-    // Recommendation algorithm based on location, skills, and experience
     return workers
       .filter(worker => {
-        // Match based on skill overlap
         const matchingSkills = worker.skills.filter(
           skill => job.requiredSkills.includes(skill)
         );
         
-        // Match based on location (same city or state)
         const locationMatch = 
           worker.location.city === job.location.city || 
           worker.location.state === job.location.state;
         
-        // Worker must have at least one matching skill AND be in the right location
         return matchingSkills.length > 0 && locationMatch;
       })
       .sort((a, b) => {
-        // Sort by number of matching skills primarily
         const aMatchCount = a.skills.filter(skill => job.requiredSkills.includes(skill)).length;
         const bMatchCount = b.skills.filter(skill => job.requiredSkills.includes(skill)).length;
         
-        // Secondary sort by exact location match
         if (bMatchCount === aMatchCount) {
           const aExactLocationMatch = a.location.city === job.location.city ? 1 : 0;
           const bExactLocationMatch = b.location.city === job.location.city ? 1 : 0;
@@ -259,6 +260,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return jobs.find(job => job.id === id);
   };
 
+  const exportData = () => {
+    saveDataToStorage({
+      users: mockUsers,
+      workers,
+      employers,
+      jobs
+    });
+    
+    toast({
+      title: "Data Exported",
+      description: "Data has been saved as a JSON file.",
+    });
+  };
+
   const value = {
     currentUser,
     workers,
@@ -273,7 +288,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     getUserRole,
     getWorkerProfile,
     getEmployerProfile,
-    getJobById
+    getJobById,
+    exportData
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
