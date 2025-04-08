@@ -19,6 +19,9 @@ import WorkerDashboard from "./pages/WorkerDashboard";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import PostJob from "./pages/PostJob";
 import WorkerProfile from "./pages/WorkerProfile";
+import EmployerProfile from "./pages/EmployerProfile";
+import EditWorkerProfile from "./pages/EditWorkerProfile";
+import EditEmployerProfile from "./pages/EditEmployerProfile";
 import Settings from "./pages/Settings";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
@@ -46,6 +49,9 @@ const App = () => {
               <Route path="/employer-dashboard" element={<EmployerDashboard />} />
               <Route path="/post-job" element={<PostJob />} />
               <Route path="/workers/:id" element={<WorkerProfile />} />
+              <Route path="/employers/:id" element={<EmployerProfile />} />
+              <Route path="/edit-worker-profile" element={<EditWorkerProfile />} />
+              <Route path="/edit-employer-profile" element={<EditEmployerProfile />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/about" element={<About />} />
               {/* Redirect Index to Home */}

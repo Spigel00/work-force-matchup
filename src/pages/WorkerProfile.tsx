@@ -7,11 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext";
 import { WorkerProfile as WorkerProfileType } from "@/types/models";
-import { MapPin, Calendar, User, ArrowUp, Briefcase } from "lucide-react";
+import { MapPin, Calendar, User, ArrowUp, Briefcase, Edit } from "lucide-react";
 
 const WorkerProfile = () => {
   const { id } = useParams<{ id: string }>();
-  const { getWorkerProfile } = useAppContext();
+  const { getWorkerProfile, currentUser } = useAppContext();
   const [worker, setWorker] = useState<WorkerProfileType | null>(null);
 
   useEffect(() => {
@@ -27,6 +27,8 @@ const WorkerProfile = () => {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  const isOwnProfile = currentUser && currentUser.id === id;
 
   if (!worker) {
     return (
@@ -45,11 +47,20 @@ const WorkerProfile = () => {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
+        <div className="mb-6 flex justify-between items-center">
           <Link to="/workers" className="text-blue-collar-600 hover:text-blue-collar-700 flex items-center">
             <ArrowUp className="h-4 w-4 mr-1 rotate-90" />
             Back to Workers
           </Link>
+          
+          {isOwnProfile && (
+            <Link to="/edit-worker-profile">
+              <Button variant="outline" className="gap-2">
+                <Edit className="h-4 w-4" />
+                Edit Profile
+              </Button>
+            </Link>
+          )}
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -133,7 +144,9 @@ const WorkerProfile = () => {
                   </div>
                   
                   <div className="mt-6">
-                    <Button className="w-full">Contact Worker</Button>
+                    {!isOwnProfile && (
+                      <Button className="w-full">Contact Worker</Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>

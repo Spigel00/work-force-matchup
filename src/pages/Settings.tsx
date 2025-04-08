@@ -4,13 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAppContext } from "@/contexts/AppContext";
-import { Download, LogOut } from "lucide-react";
+import { Download, LogOut, UserCog } from "lucide-react";
+import { Link } from "react-router-dom";
+import { UserRole } from "@/types/models";
 
 const Settings = () => {
   const { currentUser, logout, exportData } = useAppContext();
 
   const handleExportData = () => {
     exportData();
+  };
+
+  const getProfileEditLink = () => {
+    if (!currentUser) return null;
+    
+    if (currentUser.role === UserRole.WORKER) {
+      return "/edit-worker-profile";
+    } else if (currentUser.role === UserRole.EMPLOYER) {
+      return "/edit-employer-profile";
+    }
+    
+    return null;
   };
 
   return (
@@ -52,7 +66,14 @@ const Settings = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between">
-                <Button variant="outline">Edit Profile</Button>
+                {getProfileEditLink() && (
+                  <Button variant="outline" asChild>
+                    <Link to={getProfileEditLink()!}>
+                      <UserCog className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Link>
+                  </Button>
+                )}
                 <Button variant="destructive" onClick={logout}>
                   <LogOut className="w-4 h-4 mr-2" />
                   Log Out
