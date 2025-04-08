@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Adding blue-collar themed colors
+				'blue-collar': {
+					50: '#f0f7ff',
+					100: '#e0efff',
+					200: '#c0ddff',
+					300: '#90c1ff',
+					400: '#5997ff',
+					500: '#3366ff',
+					600: '#2345f5',
+					700: '#1e37e0',
+					800: '#1e30b8',
+					900: '#1e2e91',
+					950: '#111a54',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
