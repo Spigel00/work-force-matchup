@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAppContext } from "@/contexts/AppContext";
-import { Download, LogOut, UserCog } from "lucide-react";
+import { Download, LogOut, UserCog, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { UserRole } from "@/types/models";
 
@@ -65,14 +65,23 @@ const Settings = () => {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between">
+              <CardFooter className="flex flex-wrap gap-4">
                 {getProfileEditLink() && (
-                  <Button variant="outline" asChild>
-                    <Link to={getProfileEditLink()!}>
-                      <UserCog className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Link>
-                  </Button>
+                  currentUser.role === UserRole.WORKER ? (
+                    <Button variant="outline" asChild>
+                      <Link to={getProfileEditLink()!}>
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Create/Edit Profile
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button variant="outline" asChild>
+                      <Link to={getProfileEditLink()!}>
+                        <UserCog className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Link>
+                    </Button>
+                  )
                 )}
                 <Button variant="destructive" onClick={logout}>
                   <LogOut className="w-4 h-4 mr-2" />

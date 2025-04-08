@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAppContext } from "@/contexts/AppContext";
 import { UserRole } from "@/types/models";
-import { Menu, X, User, LogOut, Settings, Briefcase, Home } from "lucide-react";
+import { Menu, X, User, LogOut, Settings, Briefcase, Home, UserPlus } from "lucide-react";
 
 export const AppNav = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -92,6 +92,14 @@ export const AppNav = () => {
                 {userRole === UserRole.EMPLOYER && (
                   <Button variant="outline" className="mr-4" asChild>
                     <Link to="/post-job">Post a Job</Link>
+                  </Button>
+                )}
+                {userRole === UserRole.WORKER && (
+                  <Button variant="outline" className="mr-4" asChild>
+                    <Link to="/edit-worker-profile">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Create Profile
+                    </Link>
                   </Button>
                 )}
                 <DropdownMenu>
@@ -233,6 +241,16 @@ export const AppNav = () => {
                     onClick={closeMenu}
                   >
                     Post a Job
+                  </Link>
+                )}
+                {userRole === UserRole.WORKER && (
+                  <Link
+                    to="/edit-worker-profile"
+                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+                    onClick={closeMenu}
+                  >
+                    <UserPlus className="h-4 w-4 mr-2 inline-block align-text-bottom" />
+                    Create Profile
                   </Link>
                 )}
                 <Link
